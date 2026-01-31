@@ -1,0 +1,58 @@
+FROM ubuntu:22.04
+
+LABEL maintainer="HYDRA-LB Research Project"
+LABEL description="Mininet SDN Emulator for HYDRA-LB"
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install dependencies step by step
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    ca-certificates \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Mininet and OVS from standard repos
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    mininet \
+    openvswitch-switch \
+    openvswitch-common \
+    python3 \
+    python3-pip \
+    iproute2 \
+    iputils-ping \
+    net-tools \
+    iperf3 \
+    tcpdump \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages for topology scripts
+RUN pip3 install --no-cache-dir \
+    pyyaml \
+    numpy \
+    requests
+
+# Set working directory
+WORKDIR /app
+
+# Create directories
+RUN mkdir -p /app/topology /app/scripts /app/data
+
+# Copy topology scripts
+COPY topology/ /app/topology/
+
+# Environment variables
+ENV PYTHONPATH=/app
+
+# Start OVS service script
+RUN echo '#!/bin/bash\n\
+service openvswitch-switch start\n\
+ovs-vsctl --no-wait init\n\
+exec "$@"' > /entrypoint.sh && chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Default command (keep container running)
+CMD ["tail", "-f", "/dev/null"]
+

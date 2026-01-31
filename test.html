@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>HYDRA-LB Project Overview</title>
+    <style>
+    body { font-family: sans-serif; line-height: 1.6; margin: 2cm; max-width: 800px; margin: 0 auto; padding: 2em; }
+    h1, h2, h3 { color: #2c3e50; }
+    h1 { border-bottom: 2px solid #3498db; padding-bottom: 0.2em; }
+    h2 { margin-top: 1.5em; border-bottom: 1px solid #bdc3c7; }
+    img { max-width: 100%; height: auto; margin: 1em 0; border: 1px solid #ddd; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    code { background-color: #f8f9fa; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    pre { background-color: #f8f9fa; padding: 1em; border-radius: 4px; overflow-x: auto; }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    blockquote { border-left: 4px solid #3498db; margin: 0; padding-left: 1em; color: #7f8c8d; }
+    .print-button { position: fixed; top: 1em; right: 1em; padding: 0.5em 1em; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    @media print { .print-button { display: none; } body { max-width: 100%; margin: 0; padding: 0; } }
+</style>
+</head>
+<body>
+    <button class="print-button" onclick="window.print()">🖨️ Print to PDF</button>
+    <h1>HYDRA-LB: Project Overview &amp; Dashboard Guide 📘</h1>
+<h2>1. System Architecture</h2>
+<p>HYDRA-LB is a proactive SDN load balancer designed to optimize network traffic distribution. The system consists of:
+- <strong>Control Plane</strong>: 3x Ryu Controllers working in a cluster.
+- <strong>Data Plane</strong>: Mininet simulation with OpenFlow switches.
+- <strong>Monitoring Stack</strong>: Prometheus (metrics collection) + Grafana (visualization).
+- <strong>Intelligence Layer</strong>: LSTM-based Prediction Module (Phase 2) forecasting future network load.</p>
+<h2>2. Implementation Status</h2>
+<p>We have successfully completed <strong>Phase 1 (Infrastructure)</strong> and <strong>Phase 2 (Prediction)</strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Status</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Multi-Controller</strong></td>
+<td>✅ Active</td>
+<td>3 separate controllers handling 3 distinct network segments.</td>
+</tr>
+<tr>
+<td><strong>Monitoring</strong></td>
+<td>✅ Active</td>
+<td>Real-time tracking of packet rates, flows, CPU, RAM, and Latency.</td>
+</tr>
+<tr>
+<td><strong>Prediction</strong></td>
+<td>✅ Active</td>
+<td>LSTM model forecasts load 5 steps (25s) into the future.</td>
+</tr>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>✅ Active</td>
+<td>Comprehensive visualization of all metrics.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>3. Dashboard Guide 📊</h2>
+<h3>Section 1: Traffic Metrics</h3>
+<p><img alt="Traffic Metrics" src="file:///home/dev/.gemini/antigravity/brain/d42eda49-8423-4414-b5eb-8d0fd9502150/traffic_metrics_section_1769876394931.png" />
+- <strong>Packet Rate</strong>: The number of "Packet-In" events the controller processes per second. High values indicate heavy network activity.
+- <strong>Byte Rate</strong>: The throughput of data being processed by the controller.</p>
+<h3>Section 2: Load Prediction (The "Brain")</h3>
+<p><img alt="Load Prediction" src="file:///home/dev/.gemini/antigravity/brain/d42eda49-8423-4414-b5eb-8d0fd9502150/load_prediction_section_1769876395715.png" />
+- <strong>Actual vs Predicted</strong>: 
+  - <strong>Blue/Yellow/Green Lines (Actual)</strong>: The real-time "Load Score" (0-100) based on current traffic.
+  - <strong>Orange Dashed Line (Predicted)</strong>: What the LSTM model <em>thinks</em> the load will be in the next 5 seconds (t+1).
+  - <em>Note on Mismatch</em>: You might see Predicted (~60) vs Actual (~0). This happens because the model was trained on <strong>synthetic data</strong> (simulating a busy network avging 60 load), but the current demo environment is idle (0 load). In a production environment, you would retrain this model on your real traffic data to align them perfectly.
+- <strong>Prediction Horizon</strong>: The 5 colored lines show the forecast for t+1 (5s), t+2 (10s)... up to t+5 (25s) ahead. When these lines dip or spike, the controller knows <em>in advance</em> that load is changing.</p>
+<h3>Section 3: Performance Metrics</h3>
+<p><img alt="Performance Metrics" src="file:///home/dev/.gemini/antigravity/brain/d42eda49-8423-4414-b5eb-8d0fd9502150/performance_metrics_section_1769876396292.png" />
+- <strong>CPU Time</strong>: Cumulative CPU usage. Steeper slope = heavier processing.
+- <strong>Memory Usage</strong>: RAM consumed by the controller (typically ~275MB for this setup).
+- <strong>Request Latency</strong>: How long it takes the controller to process a switch request. Lower is better.</p>
+<hr />
+<h2>4. How to Demonstrate 🚀</h2>
+<p>We created a fully automated script to show off these features.</p>
+<p><strong>Run the Demo:</strong></p>
+<pre><code class="language-bash">./scripts/demo.sh
+</code></pre>
+<p>This script will:
+1. Start the entire cluster (6 containers).
+2. Verify all controllers are healthy.
+3. Run a traffic test to generate live data.
+4. Verify the Prediction Model is loaded and working.
+5. Direct you to the dashboard.</p>
+<p><strong>View Dashboard:</strong>
+- URL: http://localhost:3000/d/hydra-lb-main/hydra-lb-controller-dashboard
+- Login: <code>admin</code> / <code>hydra</code></p>
+</body>
+</html>

@@ -1,0 +1,139 @@
+
+services:
+  # Primary Ryu Controller
+  ryu-controller-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.ryu
+    container_name: hydra-controller-1
+    hostname: controller-1
+    ports:
+      - "6653:6653"   # OpenFlow
+      - "8080:8080"   # REST API
+    volumes:
+      - ./controller:/app/controller
+      - ./config:/app/config
+      - ./metrics:/app/metrics
+      - ./data:/app/data
+    environment:
+      - CONTROLLER_ID=1
+      - CONTROLLER_PORT=6653
+      - PYTHONUNBUFFERED=1
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.10
+    command: ryu-manager --verbose --ofp-tcp-listen-port 6653 /app/controller/ryu_app.py
+
+  # Secondary Ryu Controller
+  ryu-controller-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.ryu
+    container_name: hydra-controller-2
+    hostname: controller-2
+    ports:
+      - "6654:6653"
+      - "8081:8080"
+    volumes:
+      - ./controller:/app/controller
+      - ./config:/app/config
+      - ./metrics:/app/metrics
+      - ./data:/app/data
+    environment:
+      - CONTROLLER_ID=2
+      - CONTROLLER_PORT=6654
+      - PYTHONUNBUFFERED=1
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.11
+    command: ryu-manager --verbose --ofp-tcp-listen-port 6653 /app/controller/ryu_app.py
+
+  # Tertiary Ryu Controller
+  ryu-controller-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.ryu
+    container_name: hydra-controller-3
+    hostname: controller-3
+    ports:
+      - "6655:6653"
+      - "8082:8080"
+    volumes:
+      - ./controller:/app/controller
+      - ./config:/app/config
+      - ./metrics:/app/metrics
+      - ./data:/app/data
+    environment:
+      - CONTROLLER_ID=3
+      - CONTROLLER_PORT=6655
+      - PYTHONUNBUFFERED=1
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.12
+    command: ryu-manager --verbose --ofp-tcp-listen-port 6653 /app/controller/ryu_app.py
+
+  # Mininet Container
+  mininet:
+    build:
+      context: .
+      dockerfile: Dockerfile.mininet
+    container_name: hydra-mininet
+    hostname: mininet
+    privileged: true
+    stdin_open: true
+    tty: true
+    volumes:
+      - ./topology:/app/topology
+      - ./scripts:/app/scripts
+      - ./data:/app/data
+      - /lib/modules:/lib/modules:ro
+    environment:
+      - CONTROLLER_1=172.20.0.10:6653
+      - CONTROLLER_2=172.20.0.11:6653
+      - CONTROLLER_3=172.20.0.12:6653
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.100
+    depends_on:
+      - ryu-controller-1
+      - ryu-controller-2
+      - ryu-controller-3
+    command: tail -f /dev/null
+
+  # Prometheus (Optional - for production metrics)
+  prometheus:
+    image: prom/prometheus:v2.45.0
+    container_name: hydra-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.200
+    profiles:
+      - monitoring
+
+  # Grafana (Optional - for visualization)
+  grafana:
+    image: grafana/grafana:10.0.0
+    container_name: hydra-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=hydra
+    volumes:
+      - ./config/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    networks:
+      sdn-net:
+        ipv4_address: 172.20.0.201
+    profiles:
+      - monitoring
+
+networks:
+  sdn-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,108 @@
+# HYDRA-LB Configuration
+
+# Controller Settings
+controller:
+  id: 1
+  openflow_port: 6653
+  rest_port: 8080
+  stats_interval: 5  # seconds - how often to collect flow stats
+  
+  # Peer controllers for distributed mode
+  peers:
+    - host: 172.20.0.10
+      port: 6653
+      id: 1
+    - host: 172.20.0.11
+      port: 6653
+      id: 2
+    - host: 172.20.0.12
+      port: 6653
+      id: 3
+
+# Topology Configuration
+topology:
+  type: fat_tree  # Options: fat_tree, leaf_spine, custom
+  
+  fat_tree:
+    k: 4  # k=4 gives 20 switches, 16 hosts
+    
+  leaf_spine:
+    num_leaves: 4
+    num_spines: 2
+    hosts_per_leaf: 4
+
+# Load Balancer Settings
+load_balancer:
+  strategy: round_robin  # Options: round_robin, least_load, hydra
+  
+  # Virtual IP for load balanced services
+  virtual_ips:
+    - vip: 10.0.0.100
+      port: 80
+      servers:
+        - 10.0.0.1
+        - 10.0.0.2
+        - 10.0.0.3
+        - 10.0.0.4
+
+# Telemetry Settings
+telemetry:
+  enabled: true
+  collection_interval: 1  # seconds
+  aggregation_window: 5   # seconds
+  
+  # Metrics to collect
+  metrics:
+    - packet_in_rate
+    - flow_count
+    - byte_count
+    - controller_cpu
+    - switch_rtt
+
+# Metrics Storage
+metrics:
+  output_dir: /app/data/metrics
+  format: csv  # Options: csv, prometheus, both
+  
+  prometheus:
+    enabled: false
+    port: 9100
+    
+  csv:
+    enabled: true
+    rotation_interval: 3600  # seconds (1 hour)
+
+# Suppression Settings (for Phase 3)
+suppression:
+  enabled: false
+  tau_abs: 100       # Absolute change threshold
+  tau_rel: 0.1       # Relative change threshold (10%)
+  t_max: 10          # Maximum time between updates (seconds)
+  gamma: 0.5         # Adaptive tau_rel parameter
+
+# Migration Settings (for Phase 3)
+migration:
+  enabled: false
+  budget_per_epoch: 3        # Max migrations per optimization epoch
+  epoch_interval: 30         # Seconds between optimization runs
+  cooldown: 60               # Minimum time before re-migrating a switch
+  
+  # Cost model weights
+  cost_weights:
+    state_transfer: 0.3      # beta_1
+    rtt_delta: 0.2           # beta_2
+    cpu_increase: 0.3        # beta_3
+    packet_loss: 0.2         # beta_4
+
+# Anomaly Detection Settings (for Phase 4)
+anomaly:
+  enabled: false
+  entropy_threshold: 0.3
+  elephant_threshold: 10000  # bytes
+  detection_window: 10       # seconds
+
+# Logging
+logging:
+  level: INFO  # DEBUG, INFO, WARNING, ERROR
+  file: /app/data/hydra.log
+  console: true

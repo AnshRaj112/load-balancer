@@ -1,0 +1,18 @@
+# Prometheus configuration for HYDRA-LB
+
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'hydra-controller-1'
+    static_configs:
+      - targets: ['172.20.0.10:9100']
+    
+  - job_name: 'hydra-controller-2'
+    static_configs:
+      - targets: ['172.20.0.11:9100']
+
+  - job_name: 'hydra-controller-3'
+    static_configs:
+      - targets: ['172.20.0.12:9100']
