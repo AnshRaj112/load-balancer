@@ -1,162 +1,131 @@
-# HYDRA-LB: Hybrid Dynamic Load Balancer for SDN
+# HYDRA-LB: Proactive Control-Plane Load Balancer for Distributed SDNs
 
-A research-grade, multi-controller SDN load balancer combining:
-- **Multi-Controller Load Balancing** with real-time monitoring
-- **Predictive load forecasting** (LSTM/Attention-based) [Planned]
-- **Variance-aware optimization** with migration cost modeling [Planned]
-- **Entropy-based anomaly detection** for DDoS resilience [Planned]
+A predictive load balancing system for Software-Defined Networks that uses an **Attention-Enhanced Bidirectional LSTM** to forecast controller load and proactively migrate OpenFlow switches before saturation occurs.
 
-## 🚀 Quick Start
+## Key Features
+
+- **LSTM Prediction Engine** — Bi-LSTM with Temporal Attention forecasts controller load 5 seconds ahead using real-time telemetry (packet rate, flow count, byte rate, switch count)
+- **Proactive Optimizer** — Cost-benefit heuristic evaluates migration trade-offs and triggers preemptive switch-to-controller reassignments
+- **Physical OpenFlow Migrations** — Executes actual `OFPT_ROLE_REQUEST` commands to transfer switch ownership between controllers
+- **Real-Time Monitoring** — Prometheus + Grafana dashboard visualizing load scores, predictions, cluster variance, and migration events
+- **Benchmark Framework** — Automated evaluation across 4 traffic patterns (Steady, Burst, Flash Crowd, Skewed) comparing HYDRA-LB vs Round Robin vs Least Load
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│               Data Plane (Mininet)           │
+│    s1──s2──s3──s4──s5──s6──s7   (OVS)       │
+└──────────┬──────────┬──────────┬────────────┘
+           │          │          │
+    ┌──────┴──┐ ┌─────┴───┐ ┌───┴──────┐
+    │  Ryu C1 │ │  Ryu C2 │ │  Ryu C3  │
+    │ LSTM +  │ │ LSTM +  │ │ LSTM +   │
+    │Optimizer│ │Optimizer│ │Optimizer │
+    └────┬────┘ └────┬────┘ └────┬─────┘
+         │  HTTP Peer Exchange   │
+         └───────────┬───────────┘
+                     │
+          ┌──────────┴──────────┐
+          │ Prometheus + Grafana│
+          └─────────────────────┘
+```
+
+## Project Structure
+
+```
+load-balancer/
+├── controller/             # Ryu SDN controller application
+│   ├── ryu_app.py          # Main controller with monitoring + prediction
+│   ├── optimizer.py        # Proactive variance-aware optimizer
+│   ├── predictor.py        # LSTM inference wrapper
+│   └── baselines/          # Round Robin & Least Load strategies
+├── prediction/             # PyTorch ML pipeline
+│   ├── model.py            # Bi-LSTM + Temporal Attention architecture
+│   ├── attention.py        # Temporal attention mechanism
+│   ├── train.py            # Model training script
+│   ├── dataset.py          # Telemetry dataset & synthetic data generator
+│   └── data_collector.py   # Live metric collection for training
+├── benchmarks/             # Evaluation framework
+│   ├── run_experiment.py   # Automated experiment runner
+│   ├── workloads.py        # Traffic pattern generators
+│   ├── analyze_results.py  # Results analysis & plot generation
+│   └── retrain_model.py    # Convenience script for retraining
+├── topology/               # Mininet network topology
+├── models/                 # Pre-trained model checkpoints (.pt)
+├── config/                 # Prometheus, Grafana provisioning
+├── paper/                  # Research paper (Markdown + figures)
+├── data/                   # Collected metrics & experiment results
+├── docker-compose.yml      # Full stack deployment
+├── Dockerfile.ryu          # Controller container
+└── Dockerfile.mininet      # Data plane container
+```
+
+## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose
-- Python 3.10+
 
-### Run the Guided Demo
+- Docker & Docker Compose
+- Python 3.8+ with PyTorch (for local training/inference)
 
-```bash
-cd hydra-lb
-./scripts/demo.sh
-```
-
-This interactive script starts all services, runs load balancing tests across all 3 controllers, and guides you through the monitoring dashboard.
-
-### Manual Start
+### 1. Start the Full Stack
 
 ```bash
-# Start all services with monitoring
+# Start controllers + Mininet + monitoring
 docker compose --profile monitoring up -d
 
-# Verify all services are healthy
-docker compose ps
-
-# Stop everything
-docker compose --profile monitoring down
+# Verify all containers are running
+docker ps
 ```
 
-## 📊 Monitoring Dashboard
-
-| Component | URL | Credentials |
-|-----------|-----|-------------|
-| **Grafana Dashboard** | http://localhost:3000 | admin / hydra |
-| Prometheus | http://localhost:9090 | - |
-| Controller 1 API | http://localhost:8080 | - |
-| Controller 2 API | http://localhost:8081 | - |
-| Controller 3 API | http://localhost:8082 | - |
-
-The dashboard shows real-time metrics from all 3 controllers:
-- Packet-In Rate (per controller)
-- Connected Switches
-- Flow Count
-- Total Packets Processed
-
-## 🧪 Testing
-
-### Multi-Controller Load Balancing Test
+### 2. Run a Benchmark
 
 ```bash
-docker exec hydra-mininet python3 /app/scripts/multi_controller_test.py
+# Run HYDRA-LB under burst traffic (30s, 1 run)
+python3 benchmarks/run_experiment.py \
+    --strategy hydra_proactive \
+    --workload burst \
+    --duration 30 \
+    --runs 1
+
+# Compare against baselines
+python3 benchmarks/run_experiment.py --strategy round_robin --workload burst --duration 30 --runs 1
+python3 benchmarks/run_experiment.py --strategy least_load --workload burst --duration 30 --runs 1
 ```
 
-This tests that all 3 controllers can independently handle traffic.
-
-### Quick Network Test
+### 3. Analyze Results
 
 ```bash
-docker exec hydra-mininet mn \
-  --controller=remote,ip=172.20.0.10,port=6653 \
-  --topo=tree,depth=2,fanout=3 \
-  --test=pingall
+python3 benchmarks/analyze_results.py \
+    --input data/results \
+    --output paper/figures
 ```
 
-### Interactive Mininet Session
+### 4. View the Dashboard
 
-```bash
-docker exec -it hydra-mininet bash
-mn --controller=remote,ip=172.20.0.10,port=6653 --topo=tree,depth=2,fanout=3
-mininet> pingall
-mininet> iperf h1 h9
-mininet> exit
-```
+Open [http://localhost:3000](http://localhost:3000) (Grafana, password: `hydra`)
 
-## 📁 Project Structure
+## LSTM Model
 
-```
-hydra-lb/
-├── controller/              # SDN Controller
-│   ├── ryu_app.py          # Main controller with L2 switch + metrics
-│   ├── telemetry.py        # Flow statistics collection
-│   └── load_balancer.py    # Load balancer algorithms
-├── topology/               # Network Topologies
-│   ├── fat_tree.py        # Data center fat-tree topology
-│   └── leaf_spine.py      # Leaf-spine topology
-├── scripts/               # Automation Scripts
-│   ├── demo.sh            # Guided demo walkthrough
-│   ├── multi_controller_test.py  # Test all 3 controllers
-│   ├── start_testbed.sh   # Start services
-│   └── stop_testbed.sh    # Stop services
-├── config/                # Configuration
-│   ├── prometheus.yml     # Prometheus scrape config
-│   └── grafana/           # Grafana provisioning (persistent dashboard)
-├── metrics/               # Metrics storage
-└── data/                  # Output data
-```
+| Parameter | Value |
+|-----------|-------|
+| Architecture | Bidirectional LSTM + Temporal Attention |
+| Input | 4 features × 30 timestep lookback |
+| Output | 5-step prediction horizon (t+1 to t+5) |
+| Hidden Size | 256 (BiLSTM) → 128 (Refinement LSTM) |
+| Attention | Learned temporal attention (size 64) |
+| Parameters | ~1.8M |
 
-## 🔧 Configuration
+## Key Results
 
-### Controller Environment Variables
+Under **Burst** traffic, HYDRA-LB reduces cluster load variance by **97.7%** compared to Round Robin and Least Load, using only 1 targeted migration vs 6 reactive ones.
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `CONTROLLER_ID` | Controller identifier (1, 2, or 3) | 1 |
-| `CONTROLLER_PORT` | OpenFlow port | 6653 |
+| Strategy | Variance (σ²) | Migrations |
+|----------|:-------------:|:----------:|
+| Round Robin | 772.00 | 0 |
+| Least Load | 766.74 | 6 |
+| **HYDRA-LB** | **18.07** | **1** |
 
-### Grafana Dashboard
+## License
 
-The dashboard is automatically provisioned from `config/grafana/provisioning/`. Changes persist across container restarts.
-
-## 🛣️ Roadmap
-
-### ✅ Phase 1: Core Infrastructure (Complete)
-- [x] Docker-based multi-controller setup
-- [x] Ryu OpenFlow 1.3 controller with L2 learning switch
-- [x] Prometheus metrics endpoint (port 9100)
-- [x] Grafana dashboard with auto-provisioning
-- [x] Multi-controller load balancing verification
-- [x] Network topology support (tree, single, fat-tree)
-
-### 🔲 Phase 2: Prediction Module
-- [ ] LSTM-based load forecasting
-- [ ] Attention mechanism for time series
-- [ ] Historical data collection pipeline
-- [ ] Model training infrastructure
-
-### 🔲 Phase 3: Optimization Engine
-- [ ] Variance-aware load distribution
-- [ ] Migration cost modeling
-- [ ] Dynamic switch-to-controller assignment
-
-### 🔲 Phase 4: Security Layer
-- [ ] Entropy-based anomaly detection
-- [ ] DDoS traffic filtering
-- [ ] Suspicious flow quarantine
-
-### 🔲 Phase 5: Evaluation
-- [ ] Benchmark suite
-- [ ] Comparison with baselines
-- [ ] Paper and documentation
-
-## 🐧 Arch Linux Users
-
-See [ARCH_LINUX_GUIDE.md](ARCH_LINUX_GUIDE.md) for compatibility notes and fixes.
-
-## 📄 License
-
-Research use only. See LICENSE file for details.
-
-## 📚 References
-
-- Dynamic Load Balancing in Multi-Controller SDN
-- LOADS: Load Optimization and Anomaly Detection Scheme
-- PSO-GWO-BP for Cloud Server Load Prediction
-- PHAL: Predictive Health-Aware Load Balancing
+This project is part of academic research. See the [research paper](paper/hydra_lb_research_paper.md) for full details.

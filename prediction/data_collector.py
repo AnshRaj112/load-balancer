@@ -23,9 +23,9 @@ import requests
 
 # Default controller metrics endpoints
 CONTROLLER_ENDPOINTS = [
-    "http://localhost:9100/metrics",  # Controller 1
-    "http://localhost:9101/metrics",  # Controller 2
-    "http://localhost:9102/metrics",  # Controller 3
+    "http://172.20.0.10:9100/metrics",  # Controller 1
+    "http://172.20.0.11:9100/metrics",  # Controller 2
+    "http://172.20.0.12:9100/metrics",  # Controller 3
 ]
 
 
@@ -95,7 +95,7 @@ def extract_features(metrics: dict) -> dict:
 def collect_data(
     output_dir: str,
     duration: int = 600,
-    interval: int = 5,
+    interval: int = 1,
     endpoints: list = None
 ):
     """
@@ -162,7 +162,7 @@ def main():
                         help='Output directory')
     parser.add_argument('--duration', type=int, default=600,
                         help='Collection duration in seconds')
-    parser.add_argument('--interval', type=int, default=5,
+    parser.add_argument('--interval', type=int, default=1,
                         help='Collection interval in seconds')
     parser.add_argument('--controller', type=str, default=None,
                         help='Single controller endpoint to collect from')

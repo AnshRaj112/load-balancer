@@ -1,0 +1,2 @@
+run_id,strategy,workload,duration,variance_mean,variance_std,latency_mean,latency_std,throughput_mean,throughput_std,total_migrations
+1,least_load,flash_crowd,30,645.7448,504.0474,0.0381,0.0556,337.9648,795.0413,6.0

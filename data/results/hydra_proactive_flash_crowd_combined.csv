@@ -1,0 +1,2 @@
+run_id,strategy,workload,duration,variance_mean,variance_std,latency_mean,latency_std,throughput_mean,throughput_std,total_migrations
+1,hydra_proactive,flash_crowd,30,766.7416,472.4359,0.0467,0.0699,280.1438,597.4694,6.0

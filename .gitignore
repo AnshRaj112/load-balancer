@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# PyTorch
+*.pth
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+#tests/
+
+# Docker
+*.log
+
+# # Data (keep structure, ignore collected data)
+# data/metrics/*.csv
+# data/results/*.json
+# data/results/*.csv
+# data/training/*.csv
+# data/raw/*.csv
+
+# Runs
+runs/
+
+# Temporary files
+*.tmp
+*.bak
+
+# Scratch planning files
+PLAN.md
+context.md
+
+# Gemini agent artifacts
+.gemini/

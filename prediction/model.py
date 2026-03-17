@@ -2,15 +2,15 @@
 LSTM-based Load Prediction Model
 
 Architecture:
-    Input: [batch, seq_len=10, features=4]
+    Input: [batch, seq_len=30, features=4]
         ↓
-    LSTM Layer 1 (bidirectional, hidden=64)
+    LSTM Layer 1 (bidirectional, hidden=256, 2 layers)
         ↓
-    Temporal Attention
+    Temporal Attention (size=64)
         ↓
-    LSTM Layer 2 (hidden=32)
+    LSTM Layer 2 (hidden=128)
         ↓
-    Dense → Output: [batch, horizon=5]
+    Dense → Output: [batch, horizon=3]
 """
 
 import torch
@@ -40,10 +40,10 @@ class LoadPredictor(nn.Module):
     def __init__(
         self,
         input_size: int = 4,
-        hidden_size: int = 64,
+        hidden_size: int = 256,
         num_layers: int = 2,
-        output_size: int = 5,
-        dropout: float = 0.2,
+        output_size: int = 3,
+        dropout: float = 0.1,
         bidirectional: bool = True,
         use_attention: bool = True
     ):
@@ -71,16 +71,15 @@ class LoadPredictor(nn.Module):
         # Direction multiplier for hidden size
         self.num_directions = 2 if bidirectional else 1
         
-        # Layer normalization for input
-        self.input_norm = nn.LayerNorm(input_size)
+        # DO NOT use LayerNorm across the feature dimension for heterogeneous features
         
         # First LSTM layer (possibly bidirectional)
         self.lstm1 = nn.LSTM(
             input_size=input_size,
             hidden_size=hidden_size,
-            num_layers=1,
+            num_layers=num_layers,
             batch_first=True,
-            dropout=0,
+            dropout=dropout if num_layers > 1 else 0,
             bidirectional=bidirectional
         )
         
@@ -89,7 +88,7 @@ class LoadPredictor(nn.Module):
         if use_attention:
             self.attention = TemporalAttention(
                 hidden_size=lstm1_output_size,
-                attention_size=32
+                attention_size=64
             )
         
         # Second LSTM layer
@@ -128,8 +127,8 @@ class LoadPredictor(nn.Module):
             predictions: [batch, output_size]
             attention_weights: [batch, seq_len] (if return_attention=True)
         """
-        # Normalize input
-        x = self.input_norm(x)
+        # We REMOVED self.input_norm(x) because applying LayerNorm across 
+        # heterogeneous features (packet_rate, flow_count, etc) scrambles the signal!
         
         # First LSTM layer
         lstm1_out, _ = self.lstm1(x)  # [batch, seq_len, hidden*directions]
@@ -215,10 +214,10 @@ def create_model(config: Optional[dict] = None) -> LoadPredictor:
     """
     default_config = {
         'input_size': 4,
-        'hidden_size': 64,
+        'hidden_size': 256,
         'num_layers': 2,
-        'output_size': 5,
-        'dropout': 0.2,
+        'output_size': 3,
+        'dropout': 0.1,
         'bidirectional': True,
         'use_attention': True
     }

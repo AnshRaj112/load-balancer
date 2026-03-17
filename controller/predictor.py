@@ -37,7 +37,7 @@ class LoadPredictorInference:
     def __init__(
         self,
         model_path: str,
-        lookback: int = 10,
+        lookback: int = 30,
         device: str = 'cpu'
     ):
         """
@@ -82,8 +82,10 @@ class LoadPredictorInference:
             config = checkpoint.get('config', {}).get('model', {})
             self.model = LoadPredictor(
                 input_size=config.get('input_size', 4),
-                hidden_size=config.get('hidden_size', 64),
-                output_size=config.get('output_size', 5),
+                hidden_size=config.get('hidden_size', 256),
+                num_layers=config.get('num_layers', 2),
+                output_size=config.get('output_size', 3),
+                dropout=config.get('dropout', 0.1),
                 bidirectional=config.get('bidirectional', True),
                 use_attention=config.get('use_attention', True)
             )
@@ -117,6 +119,13 @@ class LoadPredictorInference:
                                dtype=np.float32)
         
         with self.lock:
+            # If the observation window is completely empty, pad it with the very first 
+            # observation to prevent the model from waiting 2.5 minutes (30 intervals)
+            # before it begins predicting traffic.
+            if len(self.observations) == 0:
+                for _ in range(self.lookback - 1):
+                    self.observations.append(observation)
+                    
             self.observations.append(observation)
     
     def can_predict(self) -> bool:

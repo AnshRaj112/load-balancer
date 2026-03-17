@@ -15,10 +15,13 @@ services:
       - ./config:/app/config
       - ./metrics:/app/metrics
       - ./data:/app/data
+      - ./models:/app/models
+      - ./prediction:/app/prediction
     environment:
       - CONTROLLER_ID=1
       - CONTROLLER_PORT=6653
       - PYTHONUNBUFFERED=1
+      - LB_STRATEGY=${LB_STRATEGY:-hydra_proactive}
     networks:
       sdn-net:
         ipv4_address: 172.20.0.10
@@ -39,10 +42,13 @@ services:
       - ./config:/app/config
       - ./metrics:/app/metrics
       - ./data:/app/data
+      - ./models:/app/models
+      - ./prediction:/app/prediction
     environment:
       - CONTROLLER_ID=2
       - CONTROLLER_PORT=6654
       - PYTHONUNBUFFERED=1
+      - LB_STRATEGY=${LB_STRATEGY:-hydra_proactive}
     networks:
       sdn-net:
         ipv4_address: 172.20.0.11
@@ -63,10 +69,13 @@ services:
       - ./config:/app/config
       - ./metrics:/app/metrics
       - ./data:/app/data
+      - ./models:/app/models
+      - ./prediction:/app/prediction
     environment:
       - CONTROLLER_ID=3
       - CONTROLLER_PORT=6655
       - PYTHONUNBUFFERED=1
+      - LB_STRATEGY=${LB_STRATEGY:-hydra_proactive}
     networks:
       sdn-net:
         ipv4_address: 172.20.0.12
@@ -86,11 +95,10 @@ services:
       - ./topology:/app/topology
       - ./scripts:/app/scripts
       - ./data:/app/data
+      - ./benchmarks:/app/benchmarks
       - /lib/modules:/lib/modules:ro
     environment:
-      - CONTROLLER_1=172.20.0.10:6653
-      - CONTROLLER_2=172.20.0.11:6653
-      - CONTROLLER_3=172.20.0.12:6653
+      - CONTROLLERS=172.20.0.10:6653,172.20.0.11:6653,172.20.0.12:6653
     networks:
       sdn-net:
         ipv4_address: 172.20.0.100

@@ -1,0 +1,47 @@
+{
+  "load_variance": {
+    "mean": 774.6616,
+    "std": 478.2036,
+    "min": 75.2356,
+    "max": 1095.12
+  },
+  "latency_ms": {
+    "mean": 0.0348,
+    "std": 0.0505,
+    "min": 0.0,
+    "max": 0.11
+  },
+  "throughput_pps": {
+    "mean": 489.0052,
+    "std": 977.8497,
+    "min": 0.0,
+    "max": 2483.78
+  },
+  "total_migrations": 0,
+  "num_snapshots": 7,
+  "per_controller_load": {
+    "1": {
+      "mean": 54.4571,
+      "std": 24.64,
+      "min": 18.4,
+      "max": 70.2
+    },
+    "2": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "3": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "strategy": "round_robin",
+  "workload": "flash_crowd",
+  "duration": 30,
+  "run_id": 1,
+  "timestamp": "2026-03-09T19:30:07.217444"
+}

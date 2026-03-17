@@ -1,0 +1,289 @@
+[
+  {
+    "timestamp": "2026-03-09T19:28:13.840946",
+    "controllers": {
+      "1": {
+        "load_score": 26.8,
+        "packet_rate": 0.0,
+        "byte_rate": 25891.21,
+        "flow_count": 4.0,
+        "switch_count": 4.0,
+        "packet_in_total": 23466.0,
+        "latency_avg_ms": 0.17,
+        "latency_max_ms": 12.77,
+        "cpu_seconds": 9.14,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.21,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.35,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:18.911488",
+    "controllers": {
+      "1": {
+        "load_score": 68.4,
+        "packet_rate": 188.62,
+        "byte_rate": 328360.03,
+        "flow_count": 4.0,
+        "switch_count": 4.0,
+        "packet_in_total": 47018.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.52,
+        "cpu_seconds": 14.04,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.22,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.36,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:23.984020",
+    "controllers": {
+      "1": {
+        "load_score": 18.4,
+        "packet_rate": 0.0,
+        "byte_rate": 386766.99,
+        "flow_count": 4.0,
+        "switch_count": 4.0,
+        "packet_in_total": 70306.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.42,
+        "cpu_seconds": 18.96,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.22,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.36,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:29.052980",
+    "controllers": {
+      "1": {
+        "load_score": 68.4,
+        "packet_rate": 2565.05,
+        "byte_rate": -459263.08,
+        "flow_count": 4.0,
+        "switch_count": 4.0,
+        "packet_in_total": 93089.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.57,
+        "cpu_seconds": 23.87,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.22,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.37,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:34.117213",
+    "controllers": {
+      "1": {
+        "load_score": 18.4,
+        "packet_rate": 0.0,
+        "byte_rate": 374166.12,
+        "flow_count": 4.0,
+        "switch_count": 4.0,
+        "packet_in_total": 116505.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.55,
+        "cpu_seconds": 28.8,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.23,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.37,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:39.189856",
+    "controllers": {
+      "1": {
+        "load_score": 68.4,
+        "packet_rate": 2644.52,
+        "byte_rate": 101885.63,
+        "flow_count": 5.0,
+        "switch_count": 4.0,
+        "packet_in_total": 139793.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.41,
+        "cpu_seconds": 33.71,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.23,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.37,
+        "memory_mb": 289.36
+      }
+    }
+  },
+  {
+    "timestamp": "2026-03-09T19:28:44.259085",
+    "controllers": {
+      "1": {
+        "load_score": 69.0,
+        "packet_rate": 2606.79,
+        "byte_rate": 202495.9,
+        "flow_count": 8.0,
+        "switch_count": 4.0,
+        "packet_in_total": 163081.0,
+        "latency_avg_ms": 0.1,
+        "latency_max_ms": 0.44,
+        "cpu_seconds": 38.63,
+        "memory_mb": 289.7
+      },
+      "2": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.23,
+        "memory_mb": 289.05
+      },
+      "3": {
+        "load_score": 0.0,
+        "packet_rate": 0.0,
+        "byte_rate": 0.0,
+        "flow_count": 0.0,
+        "switch_count": 0.0,
+        "packet_in_total": 0.0,
+        "latency_avg_ms": 0.0,
+        "latency_max_ms": 0.0,
+        "cpu_seconds": 4.37,
+        "memory_mb": 289.36
+      }
+    }
+  }
+]

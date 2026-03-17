@@ -1,0 +1,47 @@
+{
+  "load_variance": {
+    "mean": 793.393,
+    "std": 492.3021,
+    "min": 75.2356,
+    "max": 1152.0
+  },
+  "latency_ms": {
+    "mean": 0.0357,
+    "std": 0.0519,
+    "min": 0.0,
+    "max": 0.12
+  },
+  "throughput_pps": {
+    "mean": 451.9329,
+    "std": 899.6122,
+    "min": 0.0,
+    "max": 2490.36
+  },
+  "total_migrations": 6.0,
+  "num_snapshots": 7,
+  "per_controller_load": {
+    "1": {
+      "mean": 55.0571,
+      "std": 25.0761,
+      "min": 18.4,
+      "max": 72.0
+    },
+    "2": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "3": {
+      "mean": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    }
+  },
+  "strategy": "hydra_proactive",
+  "workload": "steady",
+  "duration": 30,
+  "run_id": 1,
+  "timestamp": "2026-03-09T19:37:01.743361"
+}
