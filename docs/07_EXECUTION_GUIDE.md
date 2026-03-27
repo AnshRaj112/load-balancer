@@ -232,7 +232,7 @@ Generates:
 
 ## 7. Training the LSTM Model
 
-### Train on Synthetic Data
+### Train on Google Cluster Traces (Default)
 
 ```bash
 cd prediction

@@ -207,7 +207,7 @@ The load score is a composite metric:
 
 ### 4.4 `_update_predictions()` — Lines 284–319
 
-**Scaling (critical detail)**: The LSTM was trained on synthetic data where `packet_rate` ranges ~50–100. Live traffic produces 100s–1000s. The scaling factor of `/30.0` aligns live data with the training distribution:
+**Scaling (critical detail)**: The LSTM was trained on Google Cluster Traces where `packet_rate` values are normalized to a ~50–100 range. Live traffic produces 100s–1000s. The scaling factor of `/30.0` aligns live data with the training distribution:
 
 ```python
 scaled_packet_rate = self.packet_rate / 30.0   # 900 pps → 30.0

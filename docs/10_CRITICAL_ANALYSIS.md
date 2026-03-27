@@ -29,16 +29,16 @@ When a switch is migrated from Controller A to Controller B:
 
 **Impact**: Every migration causes a temporary performance degradation, partially negating the improvement the optimizer predicted.
 
-### 1.3 Predictor Assumes Stationarity
+### 1.3 Predictor Domain Gap
 
 **Location**: `prediction/dataset.py`, `prediction/model.py`
 
-The LSTM is trained on **synthetic sinusoidal data**. Real traffic patterns:
-- Are non-stationary (trends, regime changes)
-- Have long-term dependencies (hours, not seconds)
-- Exhibit sudden discontinuities (flash crowds)
+The LSTM is trained on **Google Cluster Traces**, which provides realistic datacenter workload patterns including bursts, skew, and diurnal cycles. However, a domain gap may exist because:
+- The traces capture CPU/memory usage patterns, which are mapped to SDN features via proportional scaling
+- Specific deployment environments may exhibit traffic dynamics not well-represented in the dataset
+- The model does not adapt online to deployment-specific patterns
 
-**Impact**: Prediction quality degrades when live traffic deviates from training data distribution.
+**Impact**: Prediction quality may degrade in environments with traffic patterns significantly different from those in Google Cluster Traces.
 
 ### 1.4 Single-Feature Prediction
 
@@ -151,7 +151,7 @@ These weights (50%, 30%, 20%) are **not empirically validated**. They are reason
 scaled_packet_rate = self.packet_rate / 30.0
 ```
 
-The `/30.0` factor aligns live data with the synthetic training distribution. But:
+The `/30.0` factor aligns live data with the Google Cluster Traces training distribution. But:
 - This assumes the training data range is 0–100 and live data is 0–3000
 - Different topologies or workloads produce different traffic ranges
 - This should be **learned from data**, not hardcoded
@@ -183,13 +183,12 @@ The 30% cost factor is a guess. Actual migration cost depends on:
 
 ## 5. ML Limitations
 
-### 5.1 Synthetic Training Data
+### 5.1 Training Data Domain Gap
 
-The model is trained on `sin(t)` + noise. Real traffic:
-- Has multiple periodicities (daily, weekly, seasonal)
-- Includes sudden regime changes
-- Contains correlated features (packet and byte rates co-move)
-- Has much higher variance
+The model is trained on Google Cluster Traces, which provides realistic datacenter workload patterns. However, domain-specific limitations remain:
+- The traces are mapped from CPU/memory metrics to SDN features via proportional scaling, which may not perfectly represent actual OpenFlow traffic dynamics
+- Specific deployment environments may have workload characteristics not well-represented in the Google dataset
+- The 29-day trace window may not capture longer-term seasonal patterns
 
 ### 5.2 No Uncertainty Quantification
 

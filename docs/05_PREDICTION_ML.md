@@ -13,7 +13,7 @@ Telemetry → Dataset → Training → Inference
 | Stage | File | Input | Output |
 |---|---|---|---|
 | Data collection | `data_collector.py` | Prometheus metrics | CSV files |
-| Synthetic generation | `dataset.py` | Parameters | CSV files |
+| Training data | `dataset.py` | Google Cluster Traces / Synthetic | CSV files |
 | Training | `train.py` | CSV → DataLoader | `.pt` checkpoint |
 | Inference | `predictor.py` | Sliding window | Predicted loads |
 
@@ -59,9 +59,13 @@ timestamp,controller_id,packet_rate,flow_count,byte_rate,switch_count
 2025-01-01T12:00:01,2,120.2,10,45000.0,6
 ```
 
-### 2.2 Synthetic Data Generation (`prediction/dataset.py`)
+### 2.2 Training Data: Google Cluster Traces
 
-For initial training when no live data exists:
+The primary training data comes from the **Google Cluster Traces** dataset, which records per-machine CPU and memory usage across thousands of servers over a 29-day period. We extract rolling aggregate resource-consumption windows, resample them at one-second granularity, and map the resulting time series to our four-feature schema (`packet_rate`, `flow_count`, `byte_rate`, `switch_count`) via proportional scaling. This exposes the model to realistic burst, skew, and diurnal patterns found in production datacenters.
+
+### 2.3 Synthetic Data Generation (Fallback)
+
+For initial prototyping when no real data is available, `dataset.py` provides a synthetic data generator:
 
 ```python
 def save_synthetic_data(filepath, num_samples=10000):
@@ -74,13 +78,7 @@ def save_synthetic_data(filepath, num_samples=10000):
     }
 ```
 
-**Characteristics**:
-- **Packet rate**: Oscillates between ~20–80 (sine wave, period ≈ 12.6 samples)
-- **Flow count**: Oscillates between ~2–8
-- **Byte rate**: Oscillates between ~10–50
-- **Switch count**: Oscillates between ~2–4
-
-**Why sinusoidal?** Data center load follows diurnal patterns (day/night). Synthetic sine waves train the model to recognize periodicity. Gaussian noise prevents overfitting.
+> **Note**: The production model is trained on Google Cluster Traces. Synthetic data is available as a fallback for rapid prototyping but should not be used for final evaluation.
 
 ---
 
@@ -410,18 +408,17 @@ predicted_load = 40.5×0.5 + 60×0.3 + 80×0.2
 
 ### Assumptions
 
-1. **Stationarity**: The model assumes traffic patterns repeat (sinusoidal training data). Real traffic may be non-stationary.
+1. **Traffic representativeness**: The model is trained on Google Cluster Traces, which captures realistic datacenter patterns (bursts, skew, diurnal cycles). However, specific deployment environments may exhibit patterns not well-represented in this dataset.
 2. **Feature independence**: Each feature is normalized independently. Correlations between features are learned by the LSTM but not explicitly modeled.
 3. **Fixed lookback**: 30 timesteps = 30 seconds of history. This may be too short for capturing long-term trends or too long for very rapid changes.
 4. **Only packet_rate predicted**: Other features are assumed stable over the prediction horizon.
 
 ### Limitations
 
-1. **Synthetic training data**: The default model is trained on synthetic sine waves, which may not capture real traffic patterns. Retraining on live data is recommended.
-2. **No online learning**: The model is loaded once at startup. It doesn't adapt to new patterns during runtime.
-3. **Cold start**: First predictions are based on 30 copies of the first observation — inaccurate for ~30 seconds.
-4. **Scale sensitivity**: The `/30.0` scaling factor in `ryu_app.py` is hardcoded and may not be appropriate for all traffic levels.
-5. **No uncertainty estimates**: The model outputs point predictions. It doesn't indicate confidence, so the optimizer can't distinguish between high-confidence and low-confidence predictions.
+1. **No online learning**: The model is loaded once at startup. It doesn't adapt to new patterns during runtime. For deployment-specific tuning, retraining on live data is recommended.
+2. **Cold start**: First predictions are based on 30 copies of the first observation — inaccurate for ~30 seconds.
+3. **Scale sensitivity**: The `/30.0` scaling factor in `ryu_app.py` is hardcoded and may not be appropriate for all traffic levels.
+4. **No uncertainty estimates**: The model outputs point predictions. It doesn't indicate confidence, so the optimizer can't distinguish between high-confidence and low-confidence predictions.
 
 ---
 

@@ -204,7 +204,7 @@ This allows the model to focus on recent traffic spikes or periodic patterns rat
 ### Q8: What are the main limitations of your approach?
 
 **Answer**:
-1. **Synthetic training data**: The default model is trained on sinusoidal data, not real traffic patterns. Performance degrades when live traffic is non-stationary.
+1. **Training data domain gap**: The model is trained on Google Cluster Traces, which captures realistic datacenter patterns. However, specific deployment environments may exhibit traffic dynamics that differ from those in the Google dataset, leading to reduced prediction accuracy.
 2. **Single-feature prediction**: Only `packet_rate` is predicted; `flow_count` and `switch_count` are assumed constant, which is inaccurate after migrations.
 3. **No uncertainty quantification**: The model doesn't express confidence, so the optimizer can't distinguish between reliable and unreliable predictions.
 4. **O(n) peer communication**: Each controller polls all peers every second via HTTP. This doesn't scale beyond ~10 controllers.

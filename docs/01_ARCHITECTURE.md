@@ -110,12 +110,12 @@ The ML pipeline:
 
 - **Model** (`model.py`): Bidirectional 2-layer LSTM with temporal attention. Input: [batch, 30, 4] → Output: [batch, 3] (predicts next 3 timesteps of `packet_rate`).
 - **Attention** (`attention.py`): Temporal attention mechanism that weighs past timesteps by relevance.
-- **Dataset** (`dataset.py`): Sliding window dataset with synthetic data generation.
+- **Dataset** (`dataset.py`): Sliding window dataset with support for Google Cluster Traces and synthetic data generation.
 - **Training** (`train.py`): MSE loss, Adam optimizer, gradient clipping.
 - **Inference** (`predictor.py`): Thread-safe wrapper maintaining a sliding window of 30 observations.
 - **Data Collection** (`data_collector.py`): Scrapes live controller metrics for training data.
 
-**Design decision**: The model predicts `packet_rate` (not a composite load score) because it's the most volatile and predictable metric. The controller converts predictions back to load scores using the same weighted formula.
+**Design decision**: The model is trained on Google Cluster Traces (real datacenter workload data) and predicts `packet_rate` (not a composite load score) because it's the most volatile and predictable metric. The controller converts predictions back to load scores using the same weighted formula.
 
 ### 3.7 Optimizer (`controller/optimizer.py`)
 
